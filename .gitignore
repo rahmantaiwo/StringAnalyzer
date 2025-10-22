@@ -1,0 +1,26 @@
+# Visual Studio cache and build files
+.vs/
+bin/
+obj/
+Debug/
+Release/
+*.user
+*.suo
+*.cache
+*.log
+
+# NuGet packages
+*.nupkg
+packages/
+
+# Build results
+*.exe
+*.dll
+*.pdb
+
+# Other temporary files
+*.dbmdl
+*.jfm
+*.db
+*.mdf
+*.ldf

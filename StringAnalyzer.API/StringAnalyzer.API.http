@@ -1,0 +1,6 @@
+@StringAnalyzer.API_HostAddress = http://localhost:5062
+
+GET {{StringAnalyzer.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
