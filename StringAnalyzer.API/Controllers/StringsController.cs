@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using StringAnalyzer.API.Models.DTOs;
 using StringAnalyzer.API.Services.IService;
 
@@ -17,24 +16,17 @@ namespace StringAnalyzer.API.Controllers
         }
 
         [HttpPost]
-        [HttpPost]
         public async Task<IActionResult> AnalyzeString([FromBody] CreateStringRequest request)
         {
-            if (request == null || string.IsNullOrWhiteSpace(request.Value))
-                return BadRequest("Invalid request body or missing 'value' field.");
-
             var result = await _service.AnalyzeAndSaveStringAsync(request);
             return CreatedAtAction(nameof(GetByValue), new { value = request.Value }, result);
         }
-
 
         [HttpGet("{value}")]
         public async Task<IActionResult> GetByValue(string value)
         {
             var result = await _service.GetStringByValueAsync(value);
-            if (result == null)
-                return NotFound();
-
+            if (result == null) return NotFound();
             return Ok(result);
         }
 

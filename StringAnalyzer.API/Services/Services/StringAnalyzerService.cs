@@ -18,8 +18,10 @@ namespace StringAnalyzer.API.Services.Services
                 throw new InvalidOperationException("String already exists in the system.");
 
             var value = request.Value.Trim();
-            var length = value.Length;
+
+            // Compute properties
             var isPalindrome = TextAnalysisUtility.IsPalindrome(value);
+            var length = value.Length;
             var uniqueCharacters = value.ToLower().Distinct().Count();
             var wordCount = value.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
             var frequencyMap = TextAnalysisUtility.GetFrequencyMap(value);
@@ -30,17 +32,23 @@ namespace StringAnalyzer.API.Services.Services
                 Id = hash,
                 Value = value,
                 Length = length,
-                IsPalindrome = isPalindrome,
+                IsPalindrome = isPalindrome, 
                 UniqueCharacters = uniqueCharacters,
                 WordCount = wordCount,
                 CharacterFrequencyMap = JsonSerializer.Serialize(frequencyMap),
                 CreatedAt = DateTimeOffset.UtcNow
             };
 
+
             await _stringRepo.AddAsync(record);
             await _stringRepo.SaveChangesAsync();
 
-            return new StringResponse(record);
+            var response = new StringResponse(record);
+
+            if (!isPalindrome)
+                response.Warning = "Note: This string is not a palindrome.";
+
+            return response;
         }
 
         public async Task<IEnumerable<StringResponse>> GetAllStringsAsync(FilterQueryParams filters)

@@ -19,21 +19,23 @@ namespace StringAnalyzer.API.Middleware
             {
                 await _next(context);
             }
-
             catch (ArgumentException ex)
             {
-                await HandleExceptionAsync(context, 409, "Conflict", ex.Message);
+                await HandleExceptionAsync(context, 422, "Unprocessable Entity", ex.Message);
             }
 
             catch (InvalidOperationException ex)
             {
-                await HandleExceptionAsync(context, 400, "Bad Request", ex.Message);
+                await HandleExceptionAsync(context, 409, "Conflict", ex.Message);
             }
-
+            catch (KeyNotFoundException ex)
+            {
+                await HandleExceptionAsync(context, 404, "Not Found", ex.Message);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception");
-                await HandleExceptionAsync(context, 422, "Unprocessable Entity", ex.Message);
+                _logger.LogError(ex, "Unhandled exception occurred");
+                await HandleExceptionAsync(context, 500, "Internal Server Error", ex.Message);
             }
         }
 

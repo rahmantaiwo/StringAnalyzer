@@ -7,11 +7,12 @@ namespace StringAnalyzer.API.Utils
     {
         public static class TextAnalysisUtility
         {
-            public static bool IsPalindrome(string input)
+            public static bool IsPalindrome(string value)
             {
-                var normalized = new string(input.Where(char.IsLetterOrDigit).ToArray()).ToLower();
-                return normalized.SequenceEqual(normalized.Reverse());
+                var s = value.ToLowerInvariant().Replace(" ", "");
+                return s.SequenceEqual(s.Reverse());
             }
+
 
             public static Dictionary<char, int> GetFrequencyMap(string input)
             {

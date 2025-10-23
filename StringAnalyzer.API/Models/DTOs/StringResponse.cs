@@ -1,35 +1,31 @@
-﻿using System.Text.Json;
+﻿using StringAnalyzer.API.Models;
+using StringAnalyzer.API.Models.DTOs;
+using System.Text.Json;
 
-namespace StringAnalyzer.API.Models.DTOs
+public class StringResponse
 {
-    public class StringResponse
+    public string Id { get; set; }
+    public string Value { get; set; }
+    public StringPropertiesDto Properties { get; set; }
+    public DateTimeOffset CreatedAt { get; set; }
+    public string? Warning { get; set; }
+
+    public StringResponse(StringRecord record)
     {
-        public string Id { get; set; } = string.Empty;
-        public string Value { get; set; } = string.Empty;
-        public StringPropertiesDto Properties { get; set; } = new();
-        public DateTimeOffset CreatedAt { get; set; }
-
-        public StringResponse() { }
-
-        public StringResponse(StringRecord record)
+        Id = record.Id;
+        Value = record.Value;
+        Properties = new StringPropertiesDto
         {
-            Id = record.Id;
-            Value = record.Value;
-            CreatedAt = record.CreatedAt;
+            Length = record.Length,
+            IsPalindrome = record.IsPalindrome,
+            UniqueCharacters = record.UniqueCharacters,
+            WordCount = record.WordCount,
+            Sha256Hash = record.Id,
+            CharacterFrequencyMap = JsonSerializer
+    .Deserialize<Dictionary<char, int>>(record.CharacterFrequencyMap)!
+    .ToDictionary(kvp => kvp.Key.ToString(), kvp => kvp.Value)
 
-            var freqMap = string.IsNullOrEmpty(record.CharacterFrequencyMap)
-                ? new Dictionary<string, int>()
-                : JsonSerializer.Deserialize<Dictionary<string, int>>(record.CharacterFrequencyMap) ?? new Dictionary<string, int>();
-
-            Properties = new StringPropertiesDto
-            {
-                Length = record.Length,
-                IsPalindrome = record.IsPalindrome,
-                UniqueCharacters = record.UniqueCharacters,
-                WordCount = record.WordCount,
-                Sha256Hash = record.Id,
-                CharacterFrequencyMap = freqMap
-            };
-        }
+        };
+        CreatedAt = record.CreatedAt;
     }
 }
