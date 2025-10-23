@@ -5,44 +5,70 @@ using StringAnalyzer.API.Services.IService;
 
 namespace StringAnalyzer.API.Controllers
 {
-    [Route("strings")]
     [ApiController]
-    public class StringsController(IStringAnalyzerService _stringAnalyzerServ) : ControllerBase
+    [Route("strings")]
+    public class StringAnalyzerController : ControllerBase
     {
-       
-        [HttpPost]
-        public async Task<IActionResult> Analyze([FromBody] CreateStringRequest request)
+        private readonly IStringAnalyzerService _service;
+
+        public StringAnalyzerController(IStringAnalyzerService service)
         {
-            var result = await _stringAnalyzerServ.AnalyzeAndSaveStringAsync(request);
-            return Ok(result);
+            _service = service;
         }
 
+      
+        [HttpPost]
+        public async Task<IActionResult> AnalyzeString([FromBody] CreateStringRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Value))
+                return BadRequest("Invalid request body or missing 'value' field.");
+
+            try
+            {
+                var result = await _service.AnalyzeAndSaveStringAsync(request);
+                
+                return CreatedAtAction(nameof(GetByValue), new { value = request.Value }, result);
+            }
+            catch (InvalidOperationException)
+            {
+                return Conflict("String already exists in the system.");
+            }
+            catch (Exception ex)
+            {
+                return UnprocessableEntity(ex.Message);
+            }
+        }
+
+     
         [HttpGet("{value}")]
         public async Task<IActionResult> GetByValue(string value)
         {
-            var result = await _stringAnalyzerServ.GetStringByValueAsync(value);
+            var result = await _service.GetStringByValueAsync(value);
             if (result == null) return NotFound();
             return Ok(result);
         }
 
+     
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] FilterQueryParams filters)
         {
-            var results = await _stringAnalyzerServ.GetAllStringsAsync(filters);
+            var results = await _service.GetAllStringsAsync(filters);
             return Ok(results);
         }
 
+     
         [HttpGet("filter-by-natural-language")]
         public async Task<IActionResult> FilterByNaturalLanguage([FromQuery] string query)
         {
-            var results = await _stringAnalyzerServ.FilterByNaturalLanguageAsync(query);
+            var results = await _service.FilterByNaturalLanguageAsync(query);
             return Ok(results);
         }
 
+      
         [HttpDelete("{value}")]
         public async Task<IActionResult> Delete(string value)
         {
-            var success = await _stringAnalyzerServ.DeleteStringAsync(value);
+            var success = await _service.DeleteStringAsync(value);
             return success ? NoContent() : NotFound();
         }
     }
