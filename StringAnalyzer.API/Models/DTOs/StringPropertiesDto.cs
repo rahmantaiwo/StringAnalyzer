@@ -7,6 +7,7 @@
         public int UniqueCharacters { get; set; }
         public int WordCount { get; set; }
         public string Sha256Hash { get; set; }
-        public Dictionary<char, int> CharacterFrequencyMap { get; set; }
+        public Dictionary<string, int> CharacterFrequencyMap { get; set; } = new();
+
     }
 }

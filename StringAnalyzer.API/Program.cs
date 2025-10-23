@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using StringAnalyzer.API.Middleware;
 using StringAnalyzer.API.Persistence;
 using StringAnalyzer.API.Repositories.IRepository;
 using StringAnalyzer.API.Repositories.Repository;
@@ -25,6 +26,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+// Middleware
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 // Enable Swagger
 app.UseSwagger();

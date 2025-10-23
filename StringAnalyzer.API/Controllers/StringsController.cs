@@ -16,39 +16,28 @@ namespace StringAnalyzer.API.Controllers
             _service = service;
         }
 
-      
+        [HttpPost]
         [HttpPost]
         public async Task<IActionResult> AnalyzeString([FromBody] CreateStringRequest request)
         {
             if (request == null || string.IsNullOrWhiteSpace(request.Value))
                 return BadRequest("Invalid request body or missing 'value' field.");
 
-            try
-            {
-                var result = await _service.AnalyzeAndSaveStringAsync(request);
-                
-                return CreatedAtAction(nameof(GetByValue), new { value = request.Value }, result);
-            }
-            catch (InvalidOperationException)
-            {
-                return Conflict("String already exists in the system.");
-            }
-            catch (Exception ex)
-            {
-                return UnprocessableEntity(ex.Message);
-            }
+            var result = await _service.AnalyzeAndSaveStringAsync(request);
+            return CreatedAtAction(nameof(GetByValue), new { value = request.Value }, result);
         }
 
-     
+
         [HttpGet("{value}")]
         public async Task<IActionResult> GetByValue(string value)
         {
             var result = await _service.GetStringByValueAsync(value);
-            if (result == null) return NotFound();
+            if (result == null)
+                return NotFound();
+
             return Ok(result);
         }
 
-     
         [HttpGet]
         public async Task<IActionResult> GetAll([FromQuery] FilterQueryParams filters)
         {
@@ -56,7 +45,6 @@ namespace StringAnalyzer.API.Controllers
             return Ok(results);
         }
 
-     
         [HttpGet("filter-by-natural-language")]
         public async Task<IActionResult> FilterByNaturalLanguage([FromQuery] string query)
         {
@@ -64,7 +52,6 @@ namespace StringAnalyzer.API.Controllers
             return Ok(results);
         }
 
-      
         [HttpDelete("{value}")]
         public async Task<IActionResult> Delete(string value)
         {
